@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCP Área PT-9 - Internal Security Access System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #00ff41;
+            --secondary-color: #00d4ff;
+            --accent-color: #ff0040;
+            --background-dark: #0a0a0a;
+            --background-light: #1a1a1a;
+            --text-color: #ffffff;
+            --border-color: #333333;
+            --success-color: #00ff41;
+            --warning-color: #ffaa00;
+            --error-color: #ff0040;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: var(--background-dark);
+            color: var(--text-color);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .matrix-rain {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 255, 65, 0.1) 50%, transparent 100%);
+            animation: matrix-fall 20s linear infinite;
+        }
+
+        .scan-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 255, 65, 0.03) 2px,
+                rgba(0, 255, 65, 0.03) 4px
+            );
+            animation: scan 10s linear infinite;
+        }
+
+        @keyframes matrix-fall {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
+        }
+
+        .container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            position: relative;
+        }
+
+        .logo-shield {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border-radius: 20px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        .logo-shield::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 2px solid var(--background-dark);
+            border-radius: 15px;
+        }
+
+        .logo-circle {
+            width: 60px;
+            height: 60px;
+            background: var(--background-dark);
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-folder {
+            width: 30px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 3px 3px 0 0;
+            position: relative;
+            transform: rotate(-45deg);
+        }
+
+        .logo-folder::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 5px;
+            width: 10px;
+            height: 5px;
+            background: var(--primary-color);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .logo-folder.back {
+            transform: rotate(45deg);
+            margin-right: 5px;
+        }
+
+        .logo-folder.front {
+            transform: rotate(-45deg);
+            margin-left: 5px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(0, 255, 65, 0.5); }
+            50% { box-shadow: 0 0 50px rgba(0, 255, 65, 0.8); }
+        }
+
+        .logo h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--primary-color);
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+            margin-bottom: 0.5rem;
+            letter-spacing: 3px;
+        }
+
+        .logo .subtitle {
+            font-size: 1rem;
+            color: var(--secondary-color);
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            background: var(--background-light);
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .status-active {
+            color: var(--success-color);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .main-content {
+            text-align: center;
+            max-width: 800px;
+        }
+
+        .welcome-message {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .access-button {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: var(--background-dark);
+            border: none;
+            padding: 1.5rem 3rem;
+            font-size: 1.2rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+            margin-bottom: 2rem;
+        }
+
+        .access-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 50px rgba(0, 255, 65, 0.6);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: var(--background-light);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+        }
+
+        .feature-card i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+        }
+
+        .feature-card p {
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .footer {
+            margin-top: 4rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--border-color);
+        }
+
+        .footer .motto {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary-color);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .logo h1 {
+                font-size: 2rem;
+            }
+            
+            .status-bar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .access-button {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation">
+        <div class="matrix-rain"></div>
+        <div class="scan-lines"></div>
+    </div>
+
+    <div class="container">
+        <div class="logo">
+            <div class="logo-icon">
+                <div class="logo-shield">
+                    <div class="logo-circle">
+                        <div class="logo-folder back"></div>
+                        <div class="logo-folder front"></div>
+                    </div>
+                </div>
+            </div>
+            <h1>ÁREA PT-9</h1>
+            <span class="subtitle">INTERNAL SECURITY ACCESS SYSTEM</span>
+        </div>
+        
+        <div class="status-bar">
+            <div class="status-item">
+                <i class="fas fa-circle status-active"></i>
+                <span>SISTEMA ONLINE</span>
+            </div>
+            <div class="status-item">
+                <i class="fas fa-clock"></i>
+                <span id="current-time"></span>
+            </div>
+            <div class="status-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>SEGURANÇA ATIVA</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="welcome-message">
+                <p>Bem-vindo ao <strong>SCP Área PT-9</strong></p>
+                <p>Sistema de documentação e gerenciamento da Fundação SCP</p>
+                <p>Interface avançada para roleplay e simulação de operações</p>
+            </div>
+
+            <button class="access-button" onclick="accessSystem()">
+                <i class="fas fa-unlock"></i>
+                ACESSAR SISTEMA
+            </button>
+
+            <div class="features">
+                <div class="feature-card">
+                    <i class="fas fa-user-shield"></i>
+                    <h3>Níveis de Acesso</h3>
+                    <p>Sistema hierárquico com 7 níveis de acesso, incluindo Gerência 4 com poderes absolutos</p>
+                </div>
+                
+                <div class="feature-card">
+                    <i class="fas fa-tasks"></i>
+                    <h3>Sistema de Missões</h3>
+                    <p>Crie e gerencie missões oficiais com prioridades e status de progresso</p>
+                </div>
+                
+                <div class="feature-card">
+                    <i class="fas fa-biohazard"></i>
+                    <h3>Banco de SCPs</h3>
+                    <p>Registre e gerencie SCPs com níveis de contenção e procedimentos</p>
+                </div>
+                
+                <div class="feature-card">
+                    <i class="fas fa-certificate"></i>
+                    <h3>Certificações</h3>
+                    <p>Sistema de certificações para treinamentos e autorizações especiais</p>
+                </div>
+                
+                <div class="feature-card">
+                    <i class="fas fa-building"></i>
+                    <h3>11 Departamentos</h3>
+                    <p>Comitê de Ética, Administrativo, RH, Controle de Crises e mais</p>
+                </div>
+                
+                <div class="feature-card">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>Responsivo</h3>
+                    <p>Interface otimizada para desktop, tablet e smartphone</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="motto">"Seguro, Contido, Protegido"</div>
+            <p>SCP Foundation - Área PT-9</p>
+            <p>Sistema de Roleplay e Documentação</p>
+        </div>
+    </div>
+
+    <script>
+        // Atualizar hora em tempo real
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('current-time').textContent = timeString;
+        }
+
+        // Atualizar a cada segundo
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Função para acessar o sistema
+        function accessSystem() {
+            // Aqui você pode adicionar o link para o sistema completo
+            alert('Sistema SCP Área PT-9\n\nPara acessar o sistema completo:\n\n1. Faça upload dos arquivos do sistema para o GitHub\n2. Configure o GitHub Pages\n3. Acesse o link gerado\n\nUsuário Admin:\nEmail: henriquenandrade09@gmail.com\nSenha: Bb170014');
+        }
+
+        // Efeitos visuais adicionais
+        document.addEventListener('DOMContentLoaded', function() {
+            // Efeito de digitação no título
+            const title = document.querySelector('.logo h1');
+            const text = title.textContent;
+            title.textContent = '';
+            
+            let i = 0;
+            const typeWriter = () => {
+                if (i < text.length) {
+                    title.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 100);
+                }
+            };
+            
+            setTimeout(typeWriter, 1000);
+        });
+    </script>
+</body>
+</html>
